@@ -11,25 +11,34 @@ export const handler = async (event: APIGatewayEvent) => {
     const method = event.httpMethod;
     const data = JSON.parse((event.body as string) || "");
 
+    console.log("Path", event.path);
+
     if (method === "GET") {
-      const userIds = data.id.map((item: string) => ({ id: item }));
-
-      params = {
-        TableName: process.env.USER_TABLE,
-        RequestItems: {
-          Keys: Array.from(new Set(userIds)),
-        },
-      };
-
-      const groups = await dynamodb
-        .batchGet(params as BatchGetItemInput)
-        .promise();
       return {
         statusCode: 200,
-        body: JSON.stringify(groups.Responses),
+        body: JSON.stringify("helloe from API"),
       };
     }
     if (method === "POST") {
+      if (event.path === "/user/batch") {
+        const userIds = data.id.map((item: string) => ({ id: item }));
+
+        params = {
+          TableName: process.env.USER_TABLE,
+          RequestItems: {
+            Keys: Array.from(new Set(userIds)),
+          },
+        };
+
+        const groups = await dynamodb
+          .batchGet(params as BatchGetItemInput)
+          .promise();
+        return {
+          statusCode: 200,
+          body: JSON.stringify(groups.Responses),
+        };
+      }
+
       params = {
         TableName: process.env.USER_TABLE,
         Item: {
@@ -40,13 +49,13 @@ export const handler = async (event: APIGatewayEvent) => {
         },
       };
       await dynamodb.put(params as PutItemInput).promise();
+      return {
+        statusCode: 201,
+        body: "created",
+      };
     }
-    return {
-      statusCode: 400,
-      body: "wrong choice",
-    };
   } catch (error) {
-    console.log("error", error)
+    console.log("error", error);
   }
   return {
     statusCode: 500,
