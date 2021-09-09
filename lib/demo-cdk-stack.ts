@@ -47,10 +47,19 @@ export class DemoCdkStack extends cdk.Stack {
       },
     });
 
-    const items = api.root.addResource("/user");
+    const items = api.root.addResource("/");
     items.addMethod("GET");
     items.addMethod("POST");
     items.addMethod("PUT");
     items.addMethod("DELETE");
+
+    const deployment = new apigateway.Deployment(this, "Deployment", {api});
+
+    const stage = new apigateway.Stage(this, `${props.deployEnv}_stage`, {
+      deployment,
+      stageName: props.deployEnv,
+    });
+
+    api.deploymentStage = stage;
   }
 }
