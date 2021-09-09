@@ -59,7 +59,7 @@ export const handler = async (event: APIGatewayEvent) => {
           };
 
           const res = await dynamodb.get(params as GetItemInput).promise();
-          resData.push(res.Item);
+          return resData.push(res.Item);
         });
 
         return {
