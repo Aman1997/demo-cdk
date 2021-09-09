@@ -1,7 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
 import { APIGatewayEvent } from "aws-lambda";
 import * as AWS from "aws-sdk";
-import { BatchGetItemInput, PutItemInput } from "aws-sdk/clients/dynamodb";
+import {
+  BatchGetItemInput,
+  GetItemInput,
+  PutItemInput,
+} from "aws-sdk/clients/dynamodb";
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 let params = {};
@@ -23,10 +27,12 @@ export const handler = async (event: APIGatewayEvent) => {
       if (event.path === "/user/batch") {
         const userIds = data.id.map((item: string) => ({ id: item }));
 
+        console.log("userIds", userIds);
+
         params = {
           TableName: process.env.USER_TABLE,
-          "RequestItems": {
-            "Keys": Array.from(new Set(userIds)),
+          RequestItems: {
+            Keys: Array.from(new Set(userIds)),
           },
         };
 
@@ -36,6 +42,29 @@ export const handler = async (event: APIGatewayEvent) => {
         return {
           statusCode: 200,
           body: JSON.stringify(groups.Responses),
+        };
+      }
+
+      if (event.path === "/user/getLoop") {
+        console.log("data", data);
+
+        let resData: Array<string> = [];
+
+        data.id.map(async (id: string) => {
+          params = {
+            TableName: process.env.USER_TABLE,
+            Key: {
+              id,
+            },
+          };
+
+          const res = await dynamodb.get(params as GetItemInput).promise();
+          resData.push(res.Item?.name);
+        });
+
+        return {
+          statusCode: 200,
+          body: JSON.stringify(resData),
         };
       }
 
