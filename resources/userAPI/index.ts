@@ -25,8 +25,8 @@ export const handler = async (event: APIGatewayEvent) => {
 
         params = {
           TableName: process.env.USER_TABLE,
-          RequestItems: {
-            Keys: Array.from(new Set(userIds)),
+          "RequestItems": {
+            "Keys": Array.from(new Set(userIds)),
           },
         };
 
