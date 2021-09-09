@@ -50,6 +50,7 @@ export class DemoCdkStack extends cdk.Stack {
     const items = api.root.addResource("user");
     items.addMethod("GET");
     items.addMethod("POST");
+    items.addResource("batch").addMethod("POST")
 
     const deployment = new apigateway.Deployment(this, "Deployment", {api});
 
