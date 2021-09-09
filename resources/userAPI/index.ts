@@ -48,7 +48,7 @@ export const handler = async (event: APIGatewayEvent) => {
       if (event.path === "/user/getLoop") {
         console.log("data", data);
 
-        let resData: Array<string> = [];
+        let resData: Array<any> = [];
 
         data.id.map(async (id: string) => {
           params = {
@@ -59,7 +59,7 @@ export const handler = async (event: APIGatewayEvent) => {
           };
 
           const res = await dynamodb.get(params as GetItemInput).promise();
-          resData.push(res.Item?.name);
+          resData.push(res.Item);
         });
 
         return {
