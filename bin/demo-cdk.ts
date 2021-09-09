@@ -1,6 +1,12 @@
 #!/usr/bin/env node
+import "source-map-support/register";
 import * as cdk from '@aws-cdk/core';
-import { DemoCdkStack } from '../lib/demo-cdk-stack';
+import { PipelineStack } from '../lib/pipeline-stack';
 
 const app = new cdk.App();
-new DemoCdkStack(app, 'DemoCdkStack');
+
+new PipelineStack(app, "PipelineStack", {
+      env: {account: "868528066100", region: "us-east-1"},
+  });
+  
+  app.synth();

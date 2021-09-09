@@ -1,18 +1,17 @@
-import * as sns from '@aws-cdk/aws-sns';
-import * as subs from '@aws-cdk/aws-sns-subscriptions';
-import * as sqs from '@aws-cdk/aws-sqs';
-import * as cdk from '@aws-cdk/core';
+import * as cdk from "@aws-cdk/core";
+import * as dynamodb from "@aws-cdk/aws-dynamodb";
 
+export interface BackendStackProps extends cdk.StackProps {
+  deployEnv: string;
+}
 export class DemoCdkStack extends cdk.Stack {
-  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+  constructor(scope: cdk.Construct, id: string, props: BackendStackProps) {
     super(scope, id, props);
 
-    const queue = new sqs.Queue(this, 'DemoCdkQueue', {
-      visibilityTimeout: cdk.Duration.seconds(300)
+    const userTable = new dynamodb.Table(this, "UserTable", {
+      tableName: `Users-${props.deployEnv}`,
+      partitionKey: { name: "id", type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
     });
-
-    const topic = new sns.Topic(this, 'DemoCdkTopic');
-
-    topic.addSubscription(new subs.SqsSubscription(queue));
   }
 }
