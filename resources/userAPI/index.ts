@@ -50,7 +50,7 @@ export const handler = async (event: APIGatewayEvent) => {
 
         let resData: Array<any> = [];
 
-        data.id.map(async (id: string) => {
+       const arr = data.id.map(async (id: string) => {
           params = {
             TableName: process.env.USER_TABLE,
             Key: {
@@ -58,13 +58,18 @@ export const handler = async (event: APIGatewayEvent) => {
             },
           };
 
-          const res = await dynamodb.get(params as GetItemInput).promise();
-          return resData.push(res.Item);
+          return dynamodb.get(params as GetItemInput).promise();
+          
         });
+
+        const val = await Promise.all(arr)
+
+        console.log("val", val)
+        console.log("arr", arr)
 
         return {
           statusCode: 200,
-          body: JSON.stringify(resData),
+          body: JSON.stringify(arr),
         };
       }
 
